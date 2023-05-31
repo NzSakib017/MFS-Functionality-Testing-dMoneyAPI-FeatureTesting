@@ -1,0 +1,3589 @@
+{
+	"info": {
+		"_postman_id": "e2a68bd9-e8ac-48d2-971d-755eff8eff2f",
+		"name": "MFS Functionality Testing (dMoneyAPI-FeatureTesting)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27409342"
+	},
+	"item": [
+		{
+			"name": "Login & User Search",
+			"item": [
+				{
+					"name": "User Login",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.collectionVariables.set(\"SavedToken\",jsonData.token)\r",
+									"console.log(pm.collectionVariables.get(\"SavedToken\"))\r",
+									"\r",
+									"\r",
+									"// pm.test(\"Login Attempt Successful\", function () {\r",
+									"//     pm.expect(pm.response.text()).to.include(\"Login successfully\");\r",
+									"// });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedToken}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"salman@roadtocareer.net\",\r\n    \"password\":\"1234\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/user/login",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Complete User List Search",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseURL}}/user/list",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"user",
+								"list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search User -  ADMIN",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// pm.test(\"No User Found\", function () {\r",
+									"//     pm.expect(pm.response.json().message).contain(\"User not found\");\r",
+									"// });\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedToken}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseURL}}/user/search/email/admin@roadtocareer.net",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"user",
+								"search",
+								"email",
+								"admin@roadtocareer.net"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search User -  SYSTEM",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// pm.test(\"User Should Be Found\", function () {\r",
+									"//     pm.expect(pm.response.json().message).contain(\"User found\");\r",
+									"// });\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedToken}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseURL}}/user/search/email/system@roadtocareer.net",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"user",
+								"search",
+								"email",
+								"system@roadtocareer.net"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ADMIN User Create, Login & Check",
+			"item": [
+				{
+					"name": "Add User - ADMIN",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var AdminPhoneNumberPrefix = \"01547\";\r",
+									"var Suffix =_.random(100000,111111);\r",
+									"var AdminRandPhoneNumber = AdminPhoneNumberPrefix+Suffix;\r",
+									"\r",
+									"var AdminNIDPrefix = \"19901\";\r",
+									"var AdminRandNID = AdminNIDPrefix+Suffix;\r",
+									"\r",
+									"pm.collectionVariables.set(\"AdminRandomPhoneNumber\", AdminRandPhoneNumber)\r",
+									"console.log(AdminRandPhoneNumber)\r",
+									"\r",
+									"pm.collectionVariables.set(\"AdminRandomNID\", AdminRandNID)\r",
+									"console.log(AdminRandNID)\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check User Creation\", function () {\r",
+									"    pm.collectionVariables.set(\"UserIDAdmin\", pm.response.json().user.id);\r",
+									"    pm.expect(pm.response.json().message).contains(\"User created\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedToken}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"Admin\",\r\n    \"email\":\"admin@roadtocareer.net\",\r\n    \"password\":\"1234\",\r\n    \"phone_number\":\"{{AdminRandomPhoneNumber}}\",\r\n    \"nid\":\"{{AdminRandomNID}}\",\r\n    \"role\":\"Admin\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/user/create",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"user",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Search Followed By Creation - ADMIN",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Newly Created User Should Be Found\", function () {\r",
+									"    pm.expect(pm.response.json().message).contain(\"User found\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// var jsonData = pm.response.json();\r",
+									"// pm.collectionVariables.set(\"UserIDAdmin\", jsonData.user.id);\r",
+									"\r",
+									"console.log(pm.collectionVariables.get(\"UserIDAdmin\"))\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedToken}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseURL}}/user/search/email/admin@roadtocareer.net",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"user",
+								"search",
+								"email",
+								"admin@roadtocareer.net"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Login - ADMIN - Incorrect Creds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Login Attempt Unsuccessful\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"Password incorrect\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Unauthenticated User\", function () {\r",
+									"    pm.response.to.have.status(401);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"admin@roadtocareer.net\",\r\n    \"password\":\"12534\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/user/login",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Login - ADMIN  - Correct Creds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// var jsonData = pm.response.json();\r",
+									"\r",
+									"pm.collectionVariables.set(\"SavedTokenAdmin\",pm.response.json().token)\r",
+									"console.log(pm.collectionVariables.get(\"SavedTokenAdmin\"))\r",
+									"\r",
+									"\r",
+									"pm.test(\"Login Attempt Successful\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"Login successfully\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Authenticated User\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"admin@roadtocareer.net\",\r\n    \"password\":\"1234\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/user/login",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "SYSTEM User Login & Check Copy",
+			"item": [
+				{
+					"name": "User Login - SYSTEM - Incorrect Creds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Login Attempt Unsuccessful\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"Password incorrect\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Unauthenticated User\", function () {\r",
+									"    pm.response.to.have.status(401);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"system@roadtocareer.net\",\r\n    \"password\":\"12534\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/user/login",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Login - SYSTEM  - Correct Creds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// var jsonData = pm.response.json();\r",
+									"\r",
+									"pm.collectionVariables.set(\"SavedTokenSystem\",pm.response.json().token)\r",
+									"console.log(pm.collectionVariables.get(\"SavedTokenSystem\"))\r",
+									"\r",
+									"pm.test(\"Login Attempt Successful\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"Login successfully\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Authenticated User\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"system@roadtocareer.net\",\r\n    \"password\":\"1234\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/user/login",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User Creation & Testing",
+			"item": [
+				{
+					"name": "Add User - Agent 101",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var Agent101PhoneNumberPrefix = \"01747\";\r",
+									"var Suffix =_.random(100000,111111);\r",
+									"var Agent101RandPhoneNumber = Agent101PhoneNumberPrefix+Suffix;\r",
+									"\r",
+									"var Agent101NIDPrefix = \"19911\";\r",
+									"var Agent101RandNID = Agent101NIDPrefix+Suffix;\r",
+									"\r",
+									"pm.collectionVariables.set(\"Agent101RandomPhoneNumber\", Agent101RandPhoneNumber)\r",
+									"console.log(Agent101RandPhoneNumber)\r",
+									"\r",
+									"pm.collectionVariables.set(\"Agent101RandomNID\", Agent101RandNID)\r",
+									"console.log(Agent101RandNID)\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check User Creation\", function () {\r",
+									"    // var jsonData = pm.response.json();\r",
+									"    pm.collectionVariables.set(\"Agent101UserID\", pm.response.json().user.id);\r",
+									"    pm.expect(pm.response.json().message).contains(\"User created\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"Agent 101\",\r\n    \"email\":\"agent101@roadtocareer.net\",\r\n    \"password\":\"1234\",\r\n    \"phone_number\":\"{{Agent101RandomPhoneNumber}}\",\r\n    \"nid\":\"{{Agent101RandomNID}}\",\r\n    \"role\":\"Agent\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/user/create",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"user",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add User - Customer 101",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var Customer101PhoneNumberPrefix = \"01647\";\r",
+									"var Suffix =_.random(100000,111111);\r",
+									"var Customer101RandPhoneNumber = Customer101PhoneNumberPrefix+Suffix;\r",
+									"\r",
+									"var Customer101NIDPrefix = \"19911\";\r",
+									"var Customer101RandNID = Customer101NIDPrefix+Suffix;\r",
+									"\r",
+									"pm.collectionVariables.set(\"Customer101RandomPhoneNumber\", Customer101RandPhoneNumber)\r",
+									"console.log(Customer101RandPhoneNumber)\r",
+									"\r",
+									"pm.collectionVariables.set(\"Customer101RandomNID\", Customer101RandNID)\r",
+									"console.log(Customer101RandNID)\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check User Creation\", function () {\r",
+									"    // var jsonData = pm.response.json();\r",
+									"    pm.collectionVariables.set(\"Customer101UserID\", pm.response.json().user.id);\r",
+									"    pm.expect(pm.response.json().message).contains(\"User created\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"Customer 101\",\r\n    \"email\":\"customer101@roadtocareer.net\",\r\n    \"password\":\"1234\",\r\n    \"phone_number\":\"{{Customer101RandomPhoneNumber}}\",\r\n    \"nid\":\"{{Customer101RandomNID}}\",\r\n    \"role\":\"Customer\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/user/create",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"user",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add User - Customer 102",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var Customer102PhoneNumberPrefix = \"01648\";\r",
+									"var Suffix =_.random(100000,111111);\r",
+									"var Customer102RandPhoneNumber = Customer102PhoneNumberPrefix+Suffix;\r",
+									"\r",
+									"var Customer102NIDPrefix = \"19911\";\r",
+									"var Customer102RandNID = Customer102NIDPrefix+Suffix;\r",
+									"\r",
+									"pm.collectionVariables.set(\"Customer102RandomPhoneNumber\", Customer102RandPhoneNumber)\r",
+									"console.log(Customer102RandPhoneNumber)\r",
+									"\r",
+									"pm.collectionVariables.set(\"Customer102RandomNID\", Customer102RandNID)\r",
+									"console.log(Customer102RandNID)\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check User Creation\", function () {\r",
+									"    // var jsonData = pm.response.json();\r",
+									"    pm.collectionVariables.set(\"Customer102UserID\", pm.response.json().user.id);\r",
+									"    pm.expect(pm.response.json().message).contains(\"User created\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"Customer 102\",\r\n    \"email\":\"customer102@roadtocareer.net\",\r\n    \"password\":\"1234\",\r\n    \"phone_number\":\"{{Customer102RandomPhoneNumber}}\",\r\n    \"nid\":\"{{Customer102RandomNID}}\",\r\n    \"role\":\"Customer\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/user/create",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"user",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add User - Customer 102 Duplicate Entry Try",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// var Customer102PhoneNumberPrefix = \"01648\";\r",
+									"// var Suffix =_.random(100000,111111);\r",
+									"// var Customer102RandPhoneNumber = Customer102PhoneNumberPrefix+Suffix;\r",
+									"\r",
+									"// var Customer102NIDPrefix = \"19911\";\r",
+									"// var Customer102RandNID = Customer102NIDPrefix+Suffix;\r",
+									"\r",
+									"// pm.collectionVariables.set(\"Customer102RandomPhoneNumber\", Customer102RandPhoneNumber)\r",
+									"console.log(pm.collectionVariables.get(\"Customer102RandomPhoneNumber\"))\r",
+									"\r",
+									"// pm.collectionVariables.set(\"Customer102RandomNID\", Customer102RandNID)\r",
+									"console.log(pm.collectionVariables.get(\"Customer102RandomNID\"))\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Duplicate User Creation Failed\", function () {\r",
+									"    // var jsonData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(pm.response.json().message).contains(\"User already exists\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 208\", function () {\r",
+									"    pm.response.to.have.status(208);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"Customer 102\",\r\n    \"email\":\"customer102@roadtocareer.net\",\r\n    \"password\":\"1234\",\r\n    \"phone_number\":\"{{Customer102RandomPhoneNumber}}\",\r\n    \"nid\":\"{{Customer102RandomNID}}\",\r\n    \"role\":\"Customer\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/user/create",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"user",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add User - Customer 103 Without Secret Key",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Failed User Creation\", function () {\r",
+									"    // var jsonData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(pm.response.json().error.message).contains(\"Secret auth key validation failure!\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Unauthenticated Request\", function () {\r",
+									"    pm.response.to.have.status(401);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"Customer 193\",\r\n    \"email\":\"customer193@roadtocareer.net\",\r\n    \"password\":\"1234\",\r\n    \"phone_number\":\"01875ab5461\",\r\n    \"nid\":\"31890395146\",\r\n    \"role\":\"Customer\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/user/create",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"user",
+								"create"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "System Deposit to Agent (S2A)",
+			"item": [
+				{
+					"name": "Balance Check (Agent101) - Pre S2A",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseURL}}/transaction/balance/{{Agent101RandomPhoneNumber}}",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"balance",
+								"{{Agent101RandomPhoneNumber}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deposit Money - S2A - Valid Range Check - 11 TK",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful Money Deposit\", function () {    \r",
+									"    pm.expect(pm.response.json().message).contains(\"Deposit successful\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"SYSTEM\",\r\n    \"to_account\":\"{{Agent101RandomPhoneNumber}}\",\r\n    \"amount\":11\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/transaction/deposit",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"deposit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deposit Money - S2A - Valid Range Check - 10 TK",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful Money Deposit\", function () {    \r",
+									"    pm.expect(pm.response.json().message).contains(\"Deposit successful\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"SYSTEM\",\r\n    \"to_account\":\"{{Agent101RandomPhoneNumber}}\",\r\n    \"amount\":10\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/transaction/deposit",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"deposit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deposit Money - S2A - Valid Range Check - ERROR",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful Money Deposit\", function () {    \r",
+									"    pm.expect(pm.response.json().message).contains(\"Deposit successful\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"SYSTEM\",\r\n    \"to_account\":\"{{Agent101RandomPhoneNumber}}\",\r\n    \"amount\":10000\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/transaction/deposit",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"deposit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deposit Money - S2A - Valid Range Check - Variable Amount",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Maximum Agent Money Successfully Deposit\", function () {    \r",
+									"    pm.expect(pm.response.json().message).contains(\"Deposit successful\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"SYSTEM\",\r\n    \"to_account\":\"{{Agent101RandomPhoneNumber}}\",\r\n    \"amount\":9979\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/transaction/deposit",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"deposit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deposit Money - S2A - Invalid Range Check - 9 TK",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Unsuccessful Money Deposit For Invalid Range\", function () {    \r",
+									"    pm.expect(pm.response.json().message).contains(\"Minimum deposit amount 10 tk and maximum deposit amount 10000 tk\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"SYSTEM\",\r\n    \"to_account\":\"{{Agent101RandomPhoneNumber}}\",\r\n    \"amount\":9\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/transaction/deposit",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"deposit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deposit Money - S2A - Invalid Range Check - 10001 TK",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Unsuccessful Money Deposit For Invalid Range\", function () {    \r",
+									"    pm.expect(pm.response.json().message).contains(\"Minimum deposit amount 10 tk and maximum deposit amount 10000 tk\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"SYSTEM\",\r\n    \"to_account\":\"{{Agent101RandomPhoneNumber}}\",\r\n    \"amount\":10001\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/transaction/deposit",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"deposit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Balance Check (Agent101) - Post S2A",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.collectionVariables.set(\"Agent101Balance\",pm.response.json().balance)\r",
+									"console.log(pm.collectionVariables.get(\"Agent101Balance\"))"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseURL}}/transaction/balance/{{Agent101RandomPhoneNumber}}",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"balance",
+								"{{Agent101RandomPhoneNumber}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Statement Check - Post S2A",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Statement Avilable\", function () {\r",
+									"    pm.expect(pm.response.json().transactions[0].id).not.equal(null);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseURL}}/transaction/statement/{{Agent101RandomPhoneNumber}}",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"statement",
+								"{{Agent101RandomPhoneNumber}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Agent Deposit to Customer One (A2C)",
+			"item": [
+				{
+					"name": "Balance Check (Customer 101) - Pre A2C(101)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseURL}}/transaction/balance/{{Customer101RandomPhoneNumber}}",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"balance",
+								"{{Customer101RandomPhoneNumber}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deposit Money - A2C(101)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful Deposit\", function () {    \r",
+									"    pm.expect(pm.response.json().message).contains(\"Deposit successful\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{Agent101RandomPhoneNumber}}\",\r\n    \"to_account\":\"{{Customer101RandomPhoneNumber}}\",\r\n    \"amount\":10\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/transaction/deposit",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"deposit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deposit Money - A2C(101) - Variable Amount",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful Deposit\", function () {    \r",
+									"    pm.expect(pm.response.json().message).contains(\"Deposit successful\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{Agent101RandomPhoneNumber}}\",\r\n    \"to_account\":\"{{Customer101RandomPhoneNumber}}\",\r\n    \"amount\":5000\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/transaction/deposit",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"deposit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deposit Money - A2C(101) - Beyond Available Balance",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var Agent101ExcessBalanceValue = pm.collectionVariables.get(\"Agent101Balance\")+1;"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Balance Not Available\", function () {    \r",
+									"    pm.expect(pm.response.json().message).contains(\"Insufficient balance\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{Agent101RandomPhoneNumber}}\",\r\n    \"to_account\":\"{{Customer101RandomPhoneNumber}}\",\r\n    \"amount\":\"Agent101ExcessBalanceValue\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/transaction/deposit",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"deposit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Balance Check (Customer 101) - Post A2C(101)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseURL}}/transaction/balance/{{Customer101RandomPhoneNumber}}",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"balance",
+								"{{Customer101RandomPhoneNumber}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Customer One Withdraws from  Agent (C2A)",
+			"item": [
+				{
+					"name": "Agent Balance Check - Post S2A & A2C(101)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Balance Showed\", function () {\r",
+									"    pm.expect(pm.response.json().balance).not.equal(null);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseURL}}/transaction/balance/{{Agent101RandomPhoneNumber}}",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"balance",
+								"{{Agent101RandomPhoneNumber}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Login - Customer 101 - Incorrect Creds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Login Attempt Unsuccessful\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"Password incorrect\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Unauthenticated User\", function () {\r",
+									"    pm.response.to.have.status(401);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"customer101@roadtocareer.net\",\r\n    \"password\":\"12534\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/user/login",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Login - Customer 101  - Correct Creds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// var jsonData = pm.response.json();\r",
+									"\r",
+									"pm.collectionVariables.set(\"SavedTokenCustomer101\",pm.response.json().token)\r",
+									"console.log(pm.collectionVariables.get(\"SavedTokenCustomer101\"))\r",
+									"\r",
+									"\r",
+									"pm.test(\"Login Attempt Successful\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"Login successfully\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Authenticated User\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"customer101@roadtocareer.net\",\r\n    \"password\":\"1234\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/user/login",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Balance Check (Customer 101) - Pre Withdrawal A2C(101)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenCustomer101}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseURL}}/transaction/balance/{{Customer101RandomPhoneNumber}}",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"balance",
+								"{{Customer101RandomPhoneNumber}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Withdraw Money - C(101)2A - Valid Range",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful Withdraw\", function () {    \r",
+									"    pm.expect(pm.response.json().message).contains(\"Withdraw successful\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.collectionVariables.set(\"CustomerWithdrawAgentTxnID\",pm.response.json().trnxId);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenCustomer101}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{Customer101RandomPhoneNumber}}\",\r\n    \"to_account\":\"{{Agent101RandomPhoneNumber}}\",\r\n    \"amount\":10\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/transaction/withdraw",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"withdraw"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Withdraw Money - C(101)2A - Valid Range - Variable Amount",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful Withdraw\", function () {    \r",
+									"    pm.expect(pm.response.json().message).contains(\"Withdraw successful\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.collectionVariables.set(\"CustomerWithdrawAgentTxnID\",pm.response.json().trnxId);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenCustomer101}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{Customer101RandomPhoneNumber}}\",\r\n    \"to_account\":\"{{Agent101RandomPhoneNumber}}\",\r\n    \"amount\":100\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/transaction/withdraw",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"withdraw"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Transaction Check  By Txn ID - Post Withdrawal C(101)2A",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Transaction List Present\", function () {\r",
+									"    pm.expect(pm.response.json().transactions[0].id).not.equal(null);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenCustomer101}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseURL}}/transaction/search/{{CustomerWithdrawAgentTxnID}}",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"search",
+								"{{CustomerWithdrawAgentTxnID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Withdraw Money - C(101)2A Invalid Range Check - 9 TK",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Minimum Withdraw Amount Not Met\", function () {    \r",
+									"    pm.expect(pm.response.json().message).contains(\"Minimum withdraw amount 10 tk\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenCustomer101}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{Customer101RandomPhoneNumber}}\",\r\n    \"to_account\":\"{{Agent101RandomPhoneNumber}}\",\r\n    \"amount\":9\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/transaction/withdraw",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"withdraw"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Withdraw Money - C(101)2A Invalid Range Check - 10001 TK",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Maximum Balance Crossed\", function () {    \r",
+									"    pm.expect(pm.response.json().message).contains(\"Insufficient balance\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenCustomer101}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{Customer101RandomPhoneNumber}}\",\r\n    \"to_account\":\"{{Agent101RandomPhoneNumber}}\",\r\n    \"amount\":10001\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/transaction/withdraw",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"withdraw"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Agent Balance Check - Post Withdrawal C(101)2A",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseURL}}/transaction/balance/{{Agent101RandomPhoneNumber}}",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"balance",
+								"{{Agent101RandomPhoneNumber}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Customer One Send Money to Customer Two (C(101)2C(102))",
+			"item": [
+				{
+					"name": "Balance Check (Customer 101) - Post Withdrawal A2C(101)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Balance Shown\", function () {\r",
+									"    pm.expect(pm.response.json().balance).not.equal(null);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenCustomer101}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseURL}}/transaction/balance/{{Customer101RandomPhoneNumber}}",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"balance",
+								"{{Customer101RandomPhoneNumber}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Balance Check (Customer 102) - Pre Send Money C(101)2C(102)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Balance Shown\", function () {\r",
+									"    pm.expect(pm.response.json().balance).not.equal(null);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseURL}}/transaction/balance/{{Customer102RandomPhoneNumber}}",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"balance",
+								"{{Customer102RandomPhoneNumber}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Money - C(101)2C(102)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Send Money Successful\", function () {    \r",
+									"    pm.expect(pm.response.json().message).contains(\"Send money successful\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.collectionVariables.set(\"CustomerSendMoneCustomerTxnID\",pm.response.json().trnxId);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenCustomer101}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{Customer101RandomPhoneNumber}}\",\r\n    \"to_account\":\"{{Customer102RandomPhoneNumber}}\",\r\n    \"amount\":1000\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/transaction/sendmoney",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"sendmoney"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Transaction Check  By Txn ID - Post Send Money C(101)2C(102)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Transaction List Present\", function () {\r",
+									"    pm.expect(pm.response.json().transactions[0].id).not.equal(null);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenCustomer101}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseURL}}/transaction/search/{{CustomerSendMoneCustomerTxnID}}",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"search",
+								"{{CustomerSendMoneCustomerTxnID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Money - C(101)2C(102) - Negative Amount",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Negative Value Not Acceptable\", function () {    \r",
+									"    pm.expect(pm.response.json().message).not.contains(\"Send money successful\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenCustomer101}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{Customer101RandomPhoneNumber}}\",\r\n    \"to_account\":\"{{Customer102RandomPhoneNumber}}\",\r\n    \"amount\":-10\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/transaction/sendmoney",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"sendmoney"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Balance Check (Customer 101) - Post Send Money C(101)2C(102)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Balance Shown\", function () {\r",
+									"    pm.expect(pm.response.json().balance).not.equal(null);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenCustomer101}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseURL}}/transaction/balance/{{Customer101RandomPhoneNumber}}",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"balance",
+								"{{Customer101RandomPhoneNumber}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Customer Two Make Payment to Specific Merchant",
+			"item": [
+				{
+					"name": "Balance Check (Customer 102) - Post Send Money C(101)2C(102)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Balance Shown\", function () {\r",
+									"    pm.expect(pm.response.json().balance).not.equal(null);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseURL}}/transaction/balance/{{Customer102RandomPhoneNumber}}",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"balance",
+								"{{Customer102RandomPhoneNumber}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Login - Customer 102 - Incorrect Creds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Login Attempt Unsuccessful\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"Password incorrect\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Unauthenticated User\", function () {\r",
+									"    pm.response.to.have.status(401);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"customer102@roadtocareer.net\",\r\n    \"password\":\"12534\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/user/login",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Login - Customer 102  - Correct Creds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// var jsonData = pm.response.json();\r",
+									"\r",
+									"pm.collectionVariables.set(\"SavedTokenCustomer102\",pm.response.json().token)\r",
+									"console.log(pm.collectionVariables.get(\"SavedTokenCustomer102\"))\r",
+									"\r",
+									"\r",
+									"pm.test(\"Login Attempt Successful\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"Login successfully\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Authenticated User\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenAdmin}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"customer102@roadtocareer.net\",\r\n    \"password\":\"1234\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/user/login",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Payment - C(102)2M",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Payment Is Successful\", function () {    \r",
+									"    pm.expect(pm.response.json().message).contains(\"Payment successful\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.collectionVariables.set(\"CustomerPaymentMerchantTxnID\",pm.response.json().trnxId);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenCustomer102}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{Customer102RandomPhoneNumber}}\",\r\n    \"to_account\":\"01686606905\",\r\n    \"amount\":10\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/transaction/payment",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"payment"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Payment - C(102)2M - Negative Amount",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Payment Is Unsuccessful\", function () {    \r",
+									"    pm.expect(pm.response.json().message).not.contains(\"Payment successful\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"// pm.collectionVariables.set(\"CustomerPaymentMerchantTxnID\",pm.response.json().trnxId);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenCustomer102}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{Customer102RandomPhoneNumber}}\",\r\n    \"to_account\":\"01686606905\",\r\n    \"amount\":-10\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/transaction/payment",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"payment"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Transaction Check  By Txn ID - Post Payment C(102)2M",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Transaction List Present\", function () {\r",
+									"    pm.expect(pm.response.json().transactions[0].id).not.equal(null);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{SavedTokenCustomer102}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{SecretKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseURL}}/transaction/search/{{CustomerPaymentMerchantTxnID}}",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"transaction",
+								"search",
+								"{{CustomerPaymentMerchantTxnID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Balance Check (Customer 102) - Post Payment C(102)2M",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Balance Shown\", function () {\r",
+							"    pm.expect(pm.response.json().balance).not.equal(null);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{SavedTokenCustomer102}}",
+						"type": "text"
+					},
+					{
+						"key": "X-AUTH-SECRET-KEY",
+						"value": "{{SecretKey}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BaseURL}}/transaction/balance/{{Customer102RandomPhoneNumber}}",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"transaction",
+						"balance",
+						"{{Customer102RandomPhoneNumber}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Statement Check (Customer 102) - Post Payment C(102)2M",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Customer 102 Statement Shwoing\", function () {\r",
+							"    pm.expect(pm.response.json().transactions[0].id).not.equal(null);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{SavedTokenAdmin}}",
+						"type": "text"
+					},
+					{
+						"key": "X-AUTH-SECRET-KEY",
+						"value": "{{SecretKey}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BaseURL}}/transaction/statement/{{Customer102RandomPhoneNumber}}",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"transaction",
+						"statement",
+						"{{Customer102RandomPhoneNumber}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Balance Check (Specific Merchant) - Post Payment C(102)2M",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Balance Shown\", function () {\r",
+							"    pm.expect(pm.response.json().balance).not.equal(null);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{SavedTokenAdmin}}",
+						"type": "text"
+					},
+					{
+						"key": "X-AUTH-SECRET-KEY",
+						"value": "{{SecretKey}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BaseURL}}/transaction/balance/01686606905",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"transaction",
+						"balance",
+						"01686606905"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Withdraw Money - C2C - Bug Check",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Unsuccessful Withdraw\", function () {    \r",
+							"    pm.expect(pm.response.json().message).not.contains(\"Withdraw successful\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 405\", function () {\r",
+							"    pm.response.to.have.status(405);\r",
+							"});\r",
+							"\r",
+							"// pm.collectionVariables.set(\"CustomerWithdrawAgentTxnID\",pm.response.json().trnxId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{SavedTokenAdmin}}",
+						"type": "text"
+					},
+					{
+						"key": "X-AUTH-SECRET-KEY",
+						"value": "{{SecretKey}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"from_account\":\"01952417083\",\r\n    \"to_account\":\"01504090234\",\r\n    \"amount\":25\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseURL}}/transaction/withdraw",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"transaction",
+						"withdraw"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Send Money - A2C - Bug Check",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Send Money Unsuccessful\", function () {    \r",
+							"    pm.expect(pm.response.json().message).not.contains(\"Send money successful\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 405\", function () {\r",
+							"    pm.response.to.have.status(405);\r",
+							"});\r",
+							"\r",
+							"// pm.collectionVariables.set(\"CustomerSendMoneCustomerTxnID\",pm.response.json().trnxId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{SavedTokenAdmin}}",
+						"type": "text"
+					},
+					{
+						"key": "X-AUTH-SECRET-KEY",
+						"value": "{{SecretKey}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"from_account\":\"01700180698\",\r\n    \"to_account\":\"01952417083\",\r\n    \"amount\":25\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseURL}}/transaction/sendmoney",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"transaction",
+						"sendmoney"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "- User Delete - ADMIN -",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Data Deletion\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).contains(\"deleted\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{SavedToken}}",
+						"type": "text"
+					},
+					{
+						"key": "X-AUTH-SECRET-KEY",
+						"value": "{{SecretKey}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BaseURL}}/user/delete/{{UserIDAdmin}}",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"user",
+						"delete",
+						"{{UserIDAdmin}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "- User Delete - Agent 101 -",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Data Deletion\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).contains(\"deleted\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{SavedToken}}",
+						"type": "text"
+					},
+					{
+						"key": "X-AUTH-SECRET-KEY",
+						"value": "{{SecretKey}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BaseURL}}/user/delete/{{Agent101UserID}}",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"user",
+						"delete",
+						"{{Agent101UserID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "- User Delete - Customer 101 -",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Data Deletion\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).contains(\"deleted\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{SavedToken}}",
+						"type": "text"
+					},
+					{
+						"key": "X-AUTH-SECRET-KEY",
+						"value": "{{SecretKey}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BaseURL}}/user/delete/{{Customer101UserID}}",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"user",
+						"delete",
+						"{{Customer101UserID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "- User Delete - Customer 102 -",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Data Deletion\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).contains(\"deleted\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{SavedToken}}",
+						"type": "text"
+					},
+					{
+						"key": "X-AUTH-SECRET-KEY",
+						"value": "{{SecretKey}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BaseURL}}/user/delete/{{Customer102UserID}}",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"user",
+						"delete",
+						"{{Customer102UserID}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "BaseURL",
+			"value": "http://dmoney.roadtocareer.net",
+			"type": "string"
+		},
+		{
+			"key": "SavedToken",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNhbG1hbkByb2FkdG9jYXJlZXIubmV0IiwicGFzc3dvcmQiOiIxMjM0IiwiaWF0IjoxNjg1NTQ5Mjc3LCJleHAiOjE2ODU1NTEwNzd9.iZNAo3537ZdqTpzTw9pphKnhlRAszm3frp8HhH6s-Uw",
+			"type": "string"
+		},
+		{
+			"key": "SavedTokenAdmin",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQHJvYWR0b2NhcmVlci5uZXQiLCJwYXNzd29yZCI6IjEyMzQiLCJpYXQiOjE2ODU1NDkyODIsImV4cCI6MTY4NTU1MTA4Mn0.V5S-I0NMgG7owxsIBy7hfGHO2oaq9fb4Ma8cABOuN_E"
+		},
+		{
+			"key": "SavedTokenSystem",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN5c3RlbUByb2FkdG9jYXJlZXIubmV0IiwicGFzc3dvcmQiOiIxMjM0IiwiaWF0IjoxNjg1NTQ5MjgyLCJleHAiOjE2ODU1NTEwODJ9.TLItvOYLQ3qtzDHCt4gflePW9za7GlxFNpsnauH7YPk"
+		},
+		{
+			"key": "SavedTokenCustomer101",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImN1c3RvbWVyMTAxQHJvYWR0b2NhcmVlci5uZXQiLCJwYXNzd29yZCI6IjEyMzQiLCJpYXQiOjE2ODU1NDkyODUsImV4cCI6MTY4NTU1MTA4NX0.98jwSXbpOtI1X1T3ULdZUytoiEjUAz4lHNOBpxIPjxE"
+		},
+		{
+			"key": "SavedTokenCustomer102",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImN1c3RvbWVyMTAyQHJvYWR0b2NhcmVlci5uZXQiLCJwYXNzd29yZCI6IjEyMzQiLCJpYXQiOjE2ODU1NDkyODgsImV4cCI6MTY4NTU1MTA4OH0.iKTM66_d5-b0hTIJEbB2KQ8FTEWfSLL8Ot48qmH4UJM"
+		},
+		{
+			"key": "SecretKey",
+			"value": "ROADTOSDET",
+			"type": "string"
+		},
+		{
+			"key": "UserIDAdmin",
+			"value": 16514
+		},
+		{
+			"key": "AdminRandomPhoneNumber",
+			"value": "01547106922"
+		},
+		{
+			"key": "AdminRandomNID",
+			"value": "19901106922"
+		},
+		{
+			"key": "Agent101RandomPhoneNumber",
+			"value": "01747104142"
+		},
+		{
+			"key": "Agent101RandomNID",
+			"value": "19911104142"
+		},
+		{
+			"key": "Agent101UserID",
+			"value": 16515
+		},
+		{
+			"key": "Customer101RandomPhoneNumber",
+			"value": "01647107289"
+		},
+		{
+			"key": "Customer101RandomNID",
+			"value": "19911107289"
+		},
+		{
+			"key": "Customer101UserID",
+			"value": 16516
+		},
+		{
+			"key": "Customer102RandomPhoneNumber",
+			"value": "01648106506"
+		},
+		{
+			"key": "Customer102RandomNID",
+			"value": "19911106506"
+		},
+		{
+			"key": "Customer102UserID",
+			"value": 16517
+		},
+		{
+			"key": "Agent101Balance",
+			"value": 10000
+		},
+		{
+			"key": "CustomerWithdrawAgentTxnID",
+			"value": "TXN836110"
+		},
+		{
+			"key": "CustomerSendMoneCustomerTxnID",
+			"value": "TXN66004"
+		},
+		{
+			"key": "CustomerPaymentMerchantTxnID",
+			"value": "TXN131927"
+		}
+	]
+}
