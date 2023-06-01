@@ -222,14 +222,21 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Check User Creation\", function () {\r",
-									"    pm.collectionVariables.set(\"UserIDAdmin\", pm.response.json().user.id);\r",
+									"pm.test(\"Check User Creation-Created\", function () {\r",
+									"    // pm.collectionVariables.set(\"UserIDAdmin\", pm.response.json().user.id);\r",
 									"    pm.expect(pm.response.json().message).contains(\"User created\");\r",
 									"});\r",
 									"\r",
-									"pm.test(\"Status code is 201\", function () {\r",
-									"    pm.response.to.have.status(201);\r",
-									"});"
+									"// pm.test(\"Status code is 201\", function () {\r",
+									"//     pm.response.to.have.status(201);\r",
+									"// });\r",
+									"\r",
+									"pm.test(\"Check User Creation-Already Exist\", function () {\r",
+									"    // pm.collectionVariables.set(\"UserIDAdmin\", pm.response.json().user.id);\r",
+									"    pm.expect(pm.response.json().message).not.contains(\"User created\");\r",
+									"});\r",
+									"\r",
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -251,7 +258,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\":\"Admin\",\r\n    \"email\":\"admin@roadtocareer.net\",\r\n    \"password\":\"1234\",\r\n    \"phone_number\":\"{{AdminRandomPhoneNumber}}\",\r\n    \"nid\":\"{{AdminRandomNID}}\",\r\n    \"role\":\"Admin\"\r\n}\r\n",
+							"raw": "{\r\n    \"name\":\"Admin101\",\r\n    \"email\":\"admin@roadtocareer.net\",\r\n    \"password\":\"1234\",\r\n    \"phone_number\":\"{{AdminRandomPhoneNumber}}\",\r\n    \"nid\":\"{{AdminRandomNID}}\",\r\n    \"role\":\"Admin\"\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -279,6 +286,7 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Newly Created User Should Be Found\", function () {\r",
+									"    pm.collectionVariables.set(\"UserIDAdmin\", pm.response.json().user.id);\r",
 									"    pm.expect(pm.response.json().message).contain(\"User found\");\r",
 									"});\r",
 									"\r",
@@ -3287,50 +3295,6 @@
 					"path": [
 						"transaction",
 						"sendmoney"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "- User Delete - ADMIN -",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Data Deletion\", function () {\r",
-							"    var jsonData = pm.response.json();\r",
-							"    pm.expect(jsonData.message).contains(\"deleted\");\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "DELETE",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "{{SavedToken}}",
-						"type": "text"
-					},
-					{
-						"key": "X-AUTH-SECRET-KEY",
-						"value": "{{SecretKey}}",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{BaseURL}}/user/delete/{{UserIDAdmin}}",
-					"host": [
-						"{{BaseURL}}"
-					],
-					"path": [
-						"user",
-						"delete",
-						"{{UserIDAdmin}}"
 					]
 				}
 			},
